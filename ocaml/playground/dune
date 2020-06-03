@@ -1,0 +1,3 @@
+(executable
+  (libraries fmlib)
+  (name hello_fmlib))
