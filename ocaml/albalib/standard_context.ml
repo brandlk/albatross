@@ -52,6 +52,7 @@ let add_inductive (src: string) (c: Context.t): Context.t =
     | Some def ->
         match Builder.add_inductive def c with
         | Error _ ->
+            Printf.printf "Standard_context.add_inductive\n%s\n" src;
             assert false
         | Ok c ->
             c
@@ -88,17 +89,42 @@ let add_logic (c: Context.t): Context.t =
     c
     |>
     add_definition
+        "Predicate (A: Any): Any := A -> Proposition"
+    |>
+    add_definition
+        "Relation (A: Any) (B: Any): Any := A -> B -> Proposition"
+    |>
+    add_definition
+        "Endorelation (A: Any): Any := Relation A A"
+    |>
+    add_inductive
+        "class (=) (A: Any) (a: A): Predicate A := identical: a = a"
+    |>
+    add_definition
         "(=>) (a: Proposition) (b: Proposition): Proposition :=\
         \n  a -> b"
     |>
     add_inductive
         "class false: Proposition :="
     |>
+    add_definition
+        "(not) (a: Proposition): Proposition := a => false"
+    |>
     add_inductive
         "class true: Proposition := trueValid"
     |>
     add_inductive
-        "class (=) (A: Any) (a: A): A -> Proposition := identical: a = a"
+        "class (and) (a: Proposition) (b: Proposition): Proposition :=\
+        \n    (,): a => b => a and b"
+    |>
+    add_inductive
+        "class (or) (a: Proposition) (b: Proposition): Proposition :=\
+        \n    left:  a => a or b\
+        \n    right: b => a or b"
+    (*|>
+    add_inductive
+        "class exist (A: Any) (f: A -> Proposition): Proposition :=\
+        \n    witness (a: A): f a => exist f"*)
 
 
 
@@ -114,6 +140,21 @@ let add_basics (c: Context.t): Context.t =
     |>
     add_definition
         "(<|) (A: Any) (B: Any) (f: A -> B) (a: A): B := f a"
+    |>
+    add_inductive
+        "class Decision (a: Proposition) (b: Proposition): Any := \
+        \n    left:  a -> Decision a b
+        \n    right: b -> Decision a b"
+    |>
+    add_inductive
+        "class Maybe (A: Any): Any := \
+        \n    nothing: Maybe A\
+        \n    just : A -> Maybe A"
+    |>
+    add_inductive
+        "class List (A: Any): Any := \
+        \n    []: List A\
+        \n    (+:): A -> List A -> List A"
 
 
 
@@ -144,11 +185,11 @@ let add_builtins (c: Context.t): Context.t =
 let make (): Context.t =
     Context.empty
     |>
-    add_basics
-    |>
     add_logic
     |>
     add_builtins
+    |>
+    add_basics
 
 
 

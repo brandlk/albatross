@@ -26,10 +26,10 @@ type description =
     | No_inductive_type
     | Duplicate_inductive
     | Duplicate_constructor
-    | Wrong_type_constructed
+    | Wrong_type_constructed of Term.typ * Gamma.t
     | Negative
     | Nested_negative of Inductive.t * int * Gamma.t
-    | Not_positive
+    | Not_positive of Term.typ * Gamma.t
     | Not_yet_implemented of string
 
 
@@ -257,7 +257,7 @@ struct
                 names."
             <+> cut
 
-        | Wrong_type_constructed ->
+        | Wrong_type_constructed (res, gamma) ->
             wrap_words
                 "All constructors of an inductive type must construct an \
                 object of the inductive type. The constructed type must have \
@@ -267,8 +267,11 @@ struct
             <+> cut <+> cut
             <+> wrap_words
                 "where 'I' is the name of the inductive type, 'p1 p2 ...' \
-                are the parameters and 'i1 i2 ...' are the indices."
-            <+> cut
+                are the parameters and 'i1 i2 ...' are the indices. However \
+                the constructed type has the form"
+            <+> cut <+> cut
+            <+> nest 4 (PP.print res gamma)
+            <+> cut <+> cut
 
         | Negative ->
             wrap_words
@@ -297,11 +300,15 @@ struct
                  positivity condition."
             <+> cut
 
-        | Not_positive ->
+        | Not_positive (typ, gamma) ->
             wrap_words
-                "The constructor does not satify the positivity condition. \
-                One of its argument types used an inductive type of the family \
-                in a positive position, but not in the correct format."
+                "The constructor does not satisfy the positivity condition. \
+                One of its argument types uses an inductive type of the family \
+                in the positive position:"
+            <+> cut <+> cut
+            <+> nest 4 (PP.print typ gamma)
+            <+> cut <+> cut
+            <+> wrap_words "However it is not used in the correct format."
             <+> cut
 
         | Not_yet_implemented str ->
@@ -338,3 +345,14 @@ struct
         description desc
         <+> cut
 end
+
+
+
+let string_of_problem (src: string) (problem: t): string =
+    let module Pretty_printer = Pretty_printer.Pretty (String_printer) in
+    let module Error_print = Print (Pretty_printer) in
+    String_printer.run (
+        Pretty_printer.run
+            0 70 70
+            (Error_print.print_with_source src problem)
+    )

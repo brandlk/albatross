@@ -29,6 +29,8 @@ struct
         | Type_check of Expression.t
         | Define of Expression.definition
         | Clear
+        | Load of string Located.t
+        | Reload
         | Exit
         | Do_nothing
 end
@@ -401,6 +403,18 @@ struct
             *)
             )
 
+    let command_argument: string Located.t t =
+        located (
+            map
+                String.of_list
+                (
+                    one_or_more
+                    (expect
+                        (fun c -> c <> ' ' && c <> '\n' && c <> '\r')
+                        "normal character")
+                )
+        )
+
     let raw_name: string t =
         word
             Char.is_letter
@@ -707,9 +721,9 @@ struct
             parenthesized (
                 fun _ ->
                 indented (
-                    lonely_operator
-                    <|>
                     expression0 true ()
+                    <|>
+                    lonely_operator
                 )
             )
             <|>
@@ -1088,6 +1102,9 @@ struct
          map (fun e -> Command.Type_check e) (expression ());
 
          "clear", return Command.Clear;
+
+         "load",
+         map (fun file_name -> Command.Load file_name) command_argument;
 
          "define",
          map (fun def -> Command.Define def) (global_definition ());
