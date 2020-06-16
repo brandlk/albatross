@@ -7,3 +7,8 @@
   (libraries fmlib albalib)
   (modules Hello_albalib)
   (name hello_albalib))
+
+(executable
+  (libraries fmlib alba_core)
+  (modules Hello_albacore)
+  (name hello_albacore))
