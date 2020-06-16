@@ -1,3 +1,9 @@
 (executable
   (libraries fmlib)
+  (modules Hello_fmlib)
   (name hello_fmlib))
+
+(executable
+  (libraries fmlib albalib)
+  (modules Hello_albalib)
+  (name hello_albalib))
