@@ -121,10 +121,10 @@ let add_logic (c: Context.t): Context.t =
         "class (or) (a: Proposition) (b: Proposition): Proposition :=\
         \n    left:  a => a or b\
         \n    right: b => a or b"
-    (*|>
+    |>
     add_inductive
         "class exist (A: Any) (f: A -> Proposition): Proposition :=\
-        \n    witness (a: A): f a => exist f"*)
+        \n    witness (a: A): f a => exist f"
 
 
 
@@ -136,10 +136,10 @@ let add_basics (c: Context.t): Context.t =
         "identity (A: Any) (a: A): A := a"
     |>
     add_definition
-        "(|>) (A: Any) (a: A) (B: Any) (f: A -> B): B := f a"
+        "(|>) (A: Any) (a: A) (F: A -> Any) (f: all a: F a): F a := f a"
     |>
     add_definition
-        "(<|) (A: Any) (B: Any) (f: A -> B) (a: A): B := f a"
+        "(<|) (A: Any) (F: A -> Any) (f: all a: F a) (a: A): F a := f a"
     |>
     add_inductive
         "class Decision (a: Proposition) (b: Proposition): Any := \
