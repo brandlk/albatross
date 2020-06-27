@@ -9,6 +9,6 @@
   (name hello_albalib))
 
 (executable
-  (libraries fmlib alba_core)
+  (libraries fmlib alba_core albalib)
   (modules Hello_albacore)
   (name hello_albacore))
