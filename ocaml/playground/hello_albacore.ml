@@ -61,9 +61,14 @@ module Make (Final: ANY) =
         "variable"
 
     let variable: Lcu.t t =
+      get_position >>= fun p ->
+      return (printf "variable in column: %d\n" (Fmlib.Character_parser.Position.column p)) >>= fun _ ->
       var_name >>= fun v -> return (Lcu.Var v)
 
     let rec lambda (): Lcu.t t =
+      get_position >>= fun p ->
+      return (printf "lambda in column: %d\n" (Fmlib.Character_parser.Position.column p)) >>= fun _ ->
+
       return (fun v e -> Lcu.Lambda (v,e))
       |. (char '\\')
       |= var_name
@@ -71,11 +76,17 @@ module Make (Final: ANY) =
       |= expression ()
 
     and app (): Lcu.t t =
+      (* get_position >>= fun p ->
+       * return (printf "app in column: %d\n" (Fmlib.Character_parser.Position.column p)) >>= fun _ -> *)
+
       expression () >>= fun e1 ->
       expression () >>= fun e2 ->
       return (Lcu.App (e1,e2))
     
     and expression (): Lcu.t t =
+      get_position >>= fun p ->
+      return (printf "expression in column: %d\n" (Fmlib.Character_parser.Position.column p)) >>= fun _ ->
+      
       variable <|> lambda () <|> app ()
 
     let test_pipeline: string t =
@@ -101,7 +112,7 @@ let test_lcu () =
   let open LcuP in
   let p = run (expression ()) "\\x.x" in
   let r = match result p with
-    | Some (Lambda (_, Var _)) -> "ok"
+    | Some (Lambda (x, Var y)) when x=y -> "ok"
     | _ -> "error" in
   printf "%s\n" r;;
 
