@@ -67,8 +67,8 @@ module Make (Final: ANY) =
         "variable"
 
     let variable: Lcu.t t =
-      get_position >>= fun p ->
-      return (printf "variable in column: %d\n" (Fmlib.Character_parser.Position.column p)) >>= fun _ ->
+      (* get_position >>= fun p ->
+       * return (printf "variable in column: %d\n" (Fmlib.Character_parser.Position.column p)) >>= fun _ -> *)
       var_name >>= fun v -> return (Lcu.Var v)
 
     let whitespace_char: char t =
@@ -79,8 +79,8 @@ module Make (Final: ANY) =
         (skip_zero_or_more whitespace_char)
 
     let rec lambda (): Lcu.t t =
-      get_position >>= fun p ->
-      return (printf "lambda in column: %d\n" (Fmlib.Character_parser.Position.column p)) >>= fun _ ->
+      (* get_position >>= fun p ->
+       * return (printf "lambda in column: %d\n" (Fmlib.Character_parser.Position.column p)) >>= fun _ -> *)
 
       return (fun v e -> Lcu.Lambda (v,e))
       |. (char '\\')
@@ -93,8 +93,8 @@ module Make (Final: ANY) =
 
     
     and basic_expression (): Lcu.t t =
-      get_position >>= fun p ->
-      return (printf "basic_expression in column: %d\n" (Fmlib.Character_parser.Position.column p)) >>= fun _ ->
+      (* get_position >>= fun p ->
+       * return (printf "basic_expression in column: %d\n" (Fmlib.Character_parser.Position.column p)) >>= fun _ -> *)
 
       (return identity
        |. char '('
@@ -104,9 +104,9 @@ module Make (Final: ANY) =
       <|> lambda ()
 
     and expression (): Lcu.t t =
-      get_position >>= fun p ->
-      return (printf "expression in column: %d\n" (Fmlib.Character_parser.Position.column p)) >>= fun _ ->
-      
+      (* get_position >>= fun p ->
+       * return (printf "expression in column: %d\n" (Fmlib.Character_parser.Position.column p)) >>= fun _ -> *)
+      return () >>= fun _ ->
       one_or_more_separated (basic_expression ()) whitespace >>= fun lst ->
       return (match lst with
               | [] -> assert false
