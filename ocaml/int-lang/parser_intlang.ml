@@ -51,7 +51,6 @@ let print_content () =
 
 (* test_context ();; *)
 
-
 module Binder =
   struct
     type t =
@@ -121,23 +120,17 @@ module Make (Final: ANY) =
       whitespace >>= fun _ ->
       char '.' >>= fun _ ->
       whitespace >>= fun _ ->
-
-      (* update (Alba_core.Context.push_local v t) >>= fun _ -> *)
       expression () >>= fun e ->
       update (fun _ -> old_ctx) >>= fun _ ->
       return (
-          match b with
-          | Binder.Lambda  ->
-             List.fold_right
-               (fun (v,t) exp -> Term.Lambda (t,exp,Term.Lambda_info.typed v))
-               lst
-               e
-          | Binder.Pi      ->
-             List.fold_right
-               (fun (v,t) exp -> Term.Pi (t,exp,Term.Pi_info.typed v))
-               lst
-               e
-        )
+          List.fold_right
+            (fun (v,t) exp -> match b with
+                              | Binder.Lambda ->
+                                 Term.Lambda (t,exp,Term.Lambda_info.typed v)
+                              | Binder.Pi     ->
+                                 Term.Pi (t,exp,Term.Pi_info.typed v))
+            lst
+            e)
       
 
     and typed_var (): (string*Term.t) t =
@@ -224,4 +217,5 @@ test_term "\\/(x:Any).x";
 test_term "\\(x: Int).x";
 test_term "\\(T: \\/(x:Int).Any).T";
 test_term "\\(x:Any).\\(y:Any).y";
-test_term "\\(x:Any) (y: Any)(z :Any). x y z"
+test_term "\\(x:Any) (y: Any)(z :Any). x y z";
+test_term "\\(Any:Proposition).Any"
