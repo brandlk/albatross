@@ -26,6 +26,8 @@ let print_content () =
   let terms = List.init (Context.count ctx) (fun x -> Term.variable x) in
   List.map (fun x -> printf "%s\n" (Term_printer.string_of_term x (Context.gamma ctx))) terms;;
 
+print_content ();;
+
 (* let test_context () = *)
   (* let ctx = Standard_context.make () in
    * let i = Context.find_name "Int" ctx in
@@ -50,6 +52,7 @@ let print_content () =
 (* let test () = printf "Value (Int 1): %s\n" (Term_printer.string_of_term term1 Gamma.empty);; *)
 
 (* test_context ();; *)
+
 
 module Binder =
   struct
@@ -211,11 +214,30 @@ let test_term (input: string) =
 (* test_variable1 (); *)
 (* test_variable2 () *)
 
-test_term "Any";
-test_term "\\(x:Any).x";
-test_term "\\/(x:Any).x";
-test_term "\\(x: Int).x";
-test_term "\\(T: \\/(x:Int).Any).T";
-test_term "\\(x:Any).\\(y:Any).y";
-test_term "\\(x:Any) (y: Any)(z :Any). x y z";
-test_term "\\(Any:Proposition).Any"
+(* test_term "Any";
+ * test_term "\\(x:Any).x";
+ * test_term "\\/(x:Any).x";
+ * test_term "\\(x: Int).x";
+ * test_term "\\(T: \\/(x:Int).Any).T";
+ * test_term "\\(x:Any).\\(y:Any).y";
+ * test_term "\\(x:Any) (y: Any)(z :Any). x y z";
+ * test_term "\\(Any:Proposition).Any" *)
+
+let test_print_inductive (name: string) =
+  let ctx = Context.push_local "x" (Term.any) (Standard_context.make ()) in
+  let gamma = Context.gamma ctx in
+  let i::_ = Context.find_name name ctx in
+  let level = i in(*Context.level_of_index i ctx in *)
+  let Some(ind) = Gamma.inductive_at_level level gamma in
+  let typ = Gamma.type_at_level level gamma in
+  let raw = Gamma.raw_type_at_level level gamma in
+  printf "%s\n" (Print_inductive.string_of_inductive ind gamma);
+  printf "%s\n" (Gamma.name_at_level level gamma);
+  printf "%i\n" i;
+  printf "%s\n" (Term_printer.string_of_term typ gamma);
+  printf "%s\n" (Term_printer.string_of_term raw gamma);
+  let entry = Gamma.entry ((Gamma.count gamma)-1) gamma in
+  printf "%s\n" entry.name;;
+  
+
+test_print_inductive "Decision"
