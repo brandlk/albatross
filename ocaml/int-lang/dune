@@ -1,7 +1,12 @@
-(executable
+(library
   (libraries fmlib alba_core albalib)
   (modules Parser_intlang)
   (name parser_intlang))
+
+(executable
+  (libraries fmlib alba_core albalib parser_intlang)
+  (modules Test_parser)
+  (name test_parser))
 
 (env (dev
   (flags (:standard -warn-error -A))))
