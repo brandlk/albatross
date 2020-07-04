@@ -8,5 +8,10 @@
   (modules Test_parser)
   (name test_parser))
 
+(executable
+  (libraries fmlib alba_core albalib parser_intlang)
+  (modules Test_inductive)
+  (name test_inductive))
+
 (env (dev
   (flags (:standard -warn-error -A))))
